@@ -2,6 +2,10 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 
+    //Add dagger Hilt
+    id("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
+
     // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
 
@@ -78,6 +82,12 @@ dependencies {
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+
+
+    //Dagger hilt
+    implementation("com.google.dagger:hilt-android:2.45")
+    kapt("com.google.dagger:hilt-compiler:2.44")
 
 
     testImplementation("junit:junit:4.13.2")
