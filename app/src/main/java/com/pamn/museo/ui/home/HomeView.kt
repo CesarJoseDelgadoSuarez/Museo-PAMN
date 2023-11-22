@@ -1,4 +1,4 @@
-package com.pamn.museo.ui.Home
+package com.pamn.museo.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

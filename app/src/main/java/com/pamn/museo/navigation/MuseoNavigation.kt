@@ -9,9 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pamn.museo.model.AppScreens
-import com.pamn.museo.ui.Home.Pantalla1
+import com.pamn.museo.ui.home.Pantalla1
 import com.pamn.museo.ui.login.LoginScreen
-import com.pamn.museo.ui.login.LoginViewModel
 
 @Composable
 fun MuseoNavigation(){
@@ -26,8 +25,7 @@ fun MuseoNavigation(){
             Pantalla1()
         }
         composable(route = AppScreens.Login.route){
-
-            LoginScreen(LoginViewModel())
+            LoginScreen()
         }
     }
 }
