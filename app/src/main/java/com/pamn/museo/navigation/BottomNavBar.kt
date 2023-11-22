@@ -4,7 +4,9 @@ package com.pamn.museo.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,22 +21,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
+import com.pamn.museo.model.AppScreens
 
 @Composable
 fun BottomNavBar(navController: NavController){
     val items = listOf(
         BottomNavigationItem(
-            title="Pantalla 1",
+            title="Home",
             selectedIcon= Icons.Filled.Home,
             unselectedIcon= Icons.Outlined.Home,
-            route=AppScreens.Pantalla1.route,
-            hasNews = true
+            route= AppScreens.Home.route,
+            hasNews = false
         ),
         BottomNavigationItem(
-            title="Pantalla 2",
-            selectedIcon= Icons.Filled.Home,
-            unselectedIcon= Icons.Outlined.Home,
-            route=AppScreens.Pantalla2.route,
+            title="Login",
+            selectedIcon= Icons.Filled.Person,
+            unselectedIcon= Icons.Outlined.Person,
+            route= AppScreens.Login.route,
             hasNews = false
         )
     )

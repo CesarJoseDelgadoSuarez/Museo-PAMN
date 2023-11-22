@@ -1,4 +1,4 @@
-package com.pamn.museo.ViewModel
+package com.pamn.museo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

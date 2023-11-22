@@ -8,23 +8,26 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.pamn.museo.views.*
+import com.pamn.museo.model.AppScreens
+import com.pamn.museo.ui.Home.Pantalla1
+import com.pamn.museo.ui.login.LoginScreen
+import com.pamn.museo.ui.login.LoginViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppNavigation(){
+fun MuseoNavigation(){
     val navController = rememberNavController()
 
     BottomNavBar(navController = navController)
     NavHost(
         navController = navController,
-        startDestination = AppScreens.Pantalla1.route
+        startDestination = AppScreens.Home.route
     ){
-        composable(route = AppScreens.Pantalla1.route){
+        composable(route = AppScreens.Home.route){
             Pantalla1()
         }
-        composable(route = AppScreens.Pantalla2.route){
-            Pantalla2()
+        composable(route = AppScreens.Login.route){
+
+            LoginScreen(LoginViewModel())
         }
     }
 }
