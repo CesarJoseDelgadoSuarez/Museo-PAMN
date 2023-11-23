@@ -28,12 +28,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pamn.museo.R
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel= hiltViewModel() ){
+fun LoginScreen(viewModel: LoginViewModel = hiltViewModel() ){
     Box(modifier = Modifier
         .fillMaxSize()
         .padding(8.dp)
@@ -50,7 +48,6 @@ fun Login(modifier: Modifier, viewModel: LoginViewModel) {
     val loginEnabled: Boolean by viewModel.loginEnabled.observeAsState(initial = false)
     val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
 
-    val coroutineScope = rememberCoroutineScope()
 
     if (isLoading){
     Box(modifier = Modifier.fillMaxSize()){
@@ -67,9 +64,7 @@ fun Login(modifier: Modifier, viewModel: LoginViewModel) {
             ForgotPassword(Modifier.align(Alignment.End))
             Spacer(modifier = Modifier.padding(16.dp))
             LoginButton(loginEnabled){
-                coroutineScope.launch {
-                    viewModel.onLoginSelected()
-                }
+                viewModel.onLoginSelected()
             }
         }
     }

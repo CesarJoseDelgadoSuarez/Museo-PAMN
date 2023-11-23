@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import com.pamn.museo.model.AppScreens
 
@@ -75,3 +76,11 @@ fun BottomNavBar(navController: NavController){
         }
     ){}
 }
+
+data class BottomNavigationItem(
+    val title: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
+    val route: String,
+    val hasNews: Boolean
+)
