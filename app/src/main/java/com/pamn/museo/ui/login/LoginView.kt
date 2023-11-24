@@ -31,17 +31,24 @@ import com.pamn.museo.R
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel = hiltViewModel() ){
+fun LoginScreen(
+    viewModel: LoginViewModel = hiltViewModel(),
+    navigateToHomeOnSuccess: () -> Unit
+){
     Box(modifier = Modifier
         .fillMaxSize()
         .padding(8.dp)
     ){
-        Login(Modifier.align(Alignment.TopCenter), viewModel)
+        Login(Modifier.align(Alignment.TopCenter), viewModel, navigateToHomeOnSuccess = {navigateToHomeOnSuccess()})
     }
 }
 
 @Composable
-fun Login(modifier: Modifier, viewModel: LoginViewModel) {
+fun Login(
+    modifier: Modifier,
+    viewModel: LoginViewModel,
+    navigateToHomeOnSuccess: () -> Unit
+) {
 
     val email: String by viewModel.email.observeAsState(initial = "")
     val password: String by viewModel.password.observeAsState(initial = "")
@@ -64,7 +71,7 @@ fun Login(modifier: Modifier, viewModel: LoginViewModel) {
             ForgotPassword(Modifier.align(Alignment.End))
             Spacer(modifier = Modifier.padding(16.dp))
             LoginButton(loginEnabled){
-                viewModel.onLoginSelected()
+                viewModel.onLoginSelected(navigateToHomeOnSuccess = { navigateToHomeOnSuccess() })
             }
         }
     }
