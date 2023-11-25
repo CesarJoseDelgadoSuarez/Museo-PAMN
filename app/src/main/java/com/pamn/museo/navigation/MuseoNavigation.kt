@@ -24,12 +24,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.pamn.museo.model.AppScreens
 import com.pamn.museo.ui.home.HomeScreen
-import com.pamn.museo.ui.login.LoginScreen
+import com.pamn.museo.ui.SignIn.SignInScreen
 
 @Composable
-fun MuseoNavigation(navController: NavHostController) {
+fun MuseoNavigation() {
+    val navController = rememberNavController()
     val items = listOf(
         BottomNavigationItem(
             title = "Home",
@@ -42,7 +44,7 @@ fun MuseoNavigation(navController: NavHostController) {
             title = "Login",
             selectedIcon = Icons.Filled.Person,
             unselectedIcon = Icons.Outlined.Person,
-            route = AppScreens.Login.route,
+            route = AppScreens.SignIn.route,
             hasNews = false
         )
     )
@@ -88,18 +90,20 @@ fun MuseoNavigation(navController: NavHostController) {
         composable(route = AppScreens.Home.route) {
             HomeScreen()
         }
-        composable(route = AppScreens.Login.route) {
-            LoginScreen(navigateToHomeOnSuccess = {
+        composable(route = AppScreens.SignIn.route) {
+            SignInScreen(navigateToHomeOnSuccess = { screen ->
                 selectedItemIndex = items.indexOfFirst {
                     it.route === AppScreens.Home.route
                 }
-                navController.navigate(AppScreens.Home.route)
+                navigateTo(screen, navController)
             })
         }
     }
 }
 
-
+fun navigateTo(screen: AppScreens, navController: NavHostController){
+    navController.navigate(screen.route)
+}
 
 data class BottomNavigationItem(
     val title: String,

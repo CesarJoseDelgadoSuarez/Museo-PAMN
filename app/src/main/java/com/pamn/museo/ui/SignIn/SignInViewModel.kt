@@ -1,18 +1,19 @@
-package com.pamn.museo.ui.login
+package com.pamn.museo.ui.SignIn
 
-import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pamn.museo.data.AuthService
+import com.pamn.museo.model.AppScreens
+import com.pamn.museo.model.LoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
+class SignInViewModel @Inject constructor(
     private val authService: AuthService
 ): ViewModel(){
 
@@ -28,6 +29,9 @@ class LoginViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
+    private val _credentialsError = MutableLiveData<Boolean>()
+    val credentialsError: LiveData<Boolean> = _credentialsError
+
 
     fun onLoginChanged(email: String, password:String){
         _email.value = email
@@ -37,15 +41,21 @@ class LoginViewModel @Inject constructor(
 
     private fun isValidEmail(email: String): Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()
     private fun isValidPassword(password: String): Boolean = password.length >= 6
-    fun onLoginSelected(navigateToHomeOnSuccess: () -> Unit) {
+    fun onLoginSelected(navigateToHomeOnSuccess: (AppScreens) -> Unit) {
         viewModelScope.launch {
             _isLoading.value= true
 
-            val user = authService.loginWithEmailAndPassword(_email.value.toString(), _password.value.toString())
+            val loginResult = authService.loginWithEmailAndPassword(_email.value.toString(), _password.value.toString())
 
-            if (user !== null){
-                Log.d("LoginViewModel", "usuario logeado")
-                navigateToHomeOnSuccess()
+            when (loginResult) {
+                is LoginResult.Success -> {
+                    val user = loginResult.user
+                    navigateToHomeOnSuccess(AppScreens.Home)
+                }
+                is LoginResult.Error -> {
+                    val errorMessage = loginResult.message
+                    // Mostrar el mensaje de error al usuario
+                }
             }
             _isLoading.value= false
         }
