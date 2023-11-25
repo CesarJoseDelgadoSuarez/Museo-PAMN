@@ -29,5 +29,25 @@ class AuthService @Inject constructor(private val firebaseAuth: FirebaseAuth) {
         }
     }
 
+    suspend fun signUpWithEmailAndPassword(email: String, password: String): LoginResult {
+        try {
+            val user = firebaseAuth.createUserWithEmailAndPassword(email, password).await().user
+            return LoginResult.Success(user)
+        } catch (e: FirebaseAuthException) {
+            val errorMessage = when (e.errorCode) {
+                "ERROR_WEAK_PASSWORD" -> "Contraseña débil. Debe tener al menos 6 caracteres."
+                "ERROR_INVALID_EMAIL" -> "Correo electrónico no válido."
+                "ERROR_EMAIL_ALREADY_IN_USE" -> "El correo electrónico ya está en uso."
+                // Otros códigos de error según sea necesario...
+                else -> "Error de registro: ${e.message}"
+            }
+            return LoginResult.Error(errorMessage)
+        } catch (e: Exception) {
+            val errorMessage = "Error desconocido: ${e.toString()}"
+            return LoginResult.Error(errorMessage)
+        }
+    }
+
+
 
 }

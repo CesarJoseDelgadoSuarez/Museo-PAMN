@@ -94,7 +94,10 @@ dependencies {
 
     //navigation
     implementation("androidx.navigation:navigation-compose:2.7.5")
-    //implementation("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
+
+    //icons
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+
 
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:32.5.0"))

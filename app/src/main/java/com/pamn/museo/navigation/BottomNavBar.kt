@@ -1,31 +1,47 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.pamn.museo.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
+import androidx.compose.material.Badge
+import androidx.compose.material.BadgedBox
+import androidx.compose.material.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.NavController
-import com.pamn.museo.model.AppScreens
+import com.pamn.museo.model.BottomNavigationItem
+
+/// BottomNavigation.kt
 
 @Composable
-fun BottomNavBar(navController: NavController){
-
+fun BottomNavigation(
+    selectedIndex: Int,
+    items: List<BottomNavigationItem>,
+    onItemSelected: (Int) -> Unit
+) {
+    NavigationBar {
+        items.forEachIndexed { index, item ->
+            NavigationBarItem(
+                selected = selectedIndex == index,
+                onClick = {
+                    onItemSelected(index)
+                },
+                label = {
+                    Text(text = item.title)
+                },
+                icon = {
+                    BadgedBox(badge = {
+                        if (item.hasNews) {
+                            Badge()
+                        }
+                    }) {
+                        Icon(
+                            imageVector = if (index == selectedIndex) {
+                                item.selectedIcon
+                            } else item.unselectedIcon, contentDescription = item.title
+                        )
+                    }
+                }
+            )
+        }
+    }
 }
-

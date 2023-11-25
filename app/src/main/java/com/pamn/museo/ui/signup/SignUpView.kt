@@ -1,22 +1,13 @@
-package com.pamn.museo.ui.SignIn
+package com.pamn.museo.ui.signup
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -40,14 +31,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.pamn.museo.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pamn.museo.model.AppScreens
 
 @Composable
-fun SignInScreen(
-    viewModel: SignInViewModel = hiltViewModel(),
+fun SignUpScreen(
+    viewModel: SignUpViewModel = hiltViewModel(),
     navigateTo: (AppScreens) -> Unit
 ) {
     Box(
@@ -55,88 +45,53 @@ fun SignInScreen(
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        SignIn(Modifier.align(Alignment.TopCenter), viewModel, navigateTo = { navigateTo(it) })
+        SignUp(
+            Modifier.align(Alignment.TopCenter),
+            viewModel,
+            navigateTo = { navigateTo(it) }
+        )
     }
 }
 
 @Composable
-fun SignIn(
+fun SignUp(
     modifier: Modifier,
-    viewModel: SignInViewModel,
+    viewModel: SignUpViewModel,
     navigateTo: (AppScreens) -> Unit
 ) {
-
     val email: String by viewModel.email.observeAsState(initial = "")
     val password: String by viewModel.password.observeAsState(initial = "")
-    val loginEnabled: Boolean by viewModel.loginEnabled.observeAsState(initial = false)
+    val confirmPassword: String by viewModel.confirmPassword.observeAsState(initial = "")
+    val signUpEnabled: Boolean by viewModel.signUpEnabled.observeAsState(initial = false)
     val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
-    val credentialsError: Boolean by viewModel.credentialsError.observeAsState(initial = false)
-
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
             CircularProgressIndicator(Modifier.align(Alignment.Center))
         }
     } else {
-        Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-
+        Column(
+            modifier = modifier.verticalScroll(rememberScrollState())
+        ) {
             ImageLogo(Modifier.align(Alignment.CenterHorizontally))
-            Spacer(modifier = Modifier.padding(16.dp))
-            EmailField(email) { viewModel.onLoginChanged(it, password) }
+            Spacer (modifier = Modifier.padding(16.dp))
+            EmailField(email) { viewModel.onEmailChanged(it) }
             Spacer(modifier = Modifier.padding(8.dp))
-            PasswordField(password) { viewModel.onLoginChanged(email, it) }
+            PasswordField(password) { viewModel.onPasswordChanged(it) }
             Spacer(modifier = Modifier.padding(8.dp))
-            if (credentialsError) {
-                CredencialesIncorrectas(Modifier.align(Alignment.CenterHorizontally))
-                Spacer(modifier = Modifier.padding(8.dp))
-            }
-            ForgotPassword(Modifier.align(Alignment.End))
+            ConfirmPasswordField(confirmPassword) { viewModel.onConfirmPasswordChanged(it) }
             Spacer(modifier = Modifier.padding(16.dp))
-            LoginButton(loginEnabled) {
-                viewModel.onLoginSelected(navigateToHomeOnSuccess = { navigateTo(it) })
+            SignUpButton(signUpEnabled) {
+                viewModel.onSignUpSelected(navigateTo = { navigateTo(it) })
             }
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp)
-            )
-            RegisterButton(
-                navigateTo = { navigateTo(it) }
-            )
         }
     }
 }
 
 @Composable
-fun RegisterButton(navigateTo: (AppScreens) -> Unit) {
+fun SignUpButton(signUpEnabled: Boolean, onSignUpSelected: () -> Unit) {
     Button(
-        onClick = { navigateTo(AppScreens.SignUp) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFF253b6e),
-            contentColor = Color.White
-        ),
-        enabled = true
-    ) {
-        Text(text = "Registrate")
-    }
-}
-
-@Composable
-fun CredencialesIncorrectas(modifier: Modifier) {
-    Text(
-        text = "El correo o la contraseña son incorrectos",
-        modifier = modifier,
-        color = Color.Red
-    )
-}
-
-@Composable
-fun LoginButton(loginEnabled: Boolean, onLoginSelected: () -> Unit) {
-    Button(
-        onClick = { onLoginSelected() },
+        onClick = { onSignUpSelected() },
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp),
@@ -146,30 +101,61 @@ fun LoginButton(loginEnabled: Boolean, onLoginSelected: () -> Unit) {
             contentColor = Color.White,
             disabledContentColor = Color.White
         ),
-        enabled = loginEnabled
+        enabled = signUpEnabled
     ) {
-        Text(text = "Iniciar Sesión")
+        Text(text = "Registrarse")
     }
 }
 
+
 @Composable
-fun ForgotPassword(modifier: Modifier) {
-    Text(
-        text = "Olvidaste la contraseña?",
-        modifier = modifier.clickable { },
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Bold
+fun PasswordField(confirmPassword: String, onTextFieldChange: (String) -> Unit) {
+
+    var passwordVisibility by remember { mutableStateOf(false) }
+
+    TextField(
+        value = confirmPassword,
+        onValueChange = { onTextFieldChange(it) },
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = { Text(text = "Confirmar Contraseña") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        singleLine = true,
+        maxLines = 1,
+        colors = TextFieldDefaults.textFieldColors(
+            textColor = Color(0xFF636262),
+            backgroundColor = Color(0xFFDEDDDD),
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        visualTransformation = if (passwordVisibility) {
+            VisualTransformation.None
+        } else {
+            PasswordVisualTransformation()
+        },
+        trailingIcon = {
+            val image = if (passwordVisibility) {
+                Icons.Filled.VisibilityOff
+            } else {
+                Icons.Filled.Visibility
+            }
+            IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                Icon(imageVector = image, contentDescription = "boton Ver/Ocultar Contraseña")
+            }
+        },
     )
 }
 
+
 @Composable
-fun PasswordField(password: String, onTextFieldChange: (String) -> Unit) {
+fun ConfirmPasswordField(confirmPassword: String, onTextFieldChange: (String) -> Unit) {
+
     var passwordVisibility by remember { mutableStateOf(false) }
+
     TextField(
-        value = password,
+        value = confirmPassword,
         onValueChange = { onTextFieldChange(it) },
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text(text = "Password") },
+        placeholder = { Text(text = "Confirmar Contraseña") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         singleLine = true,
         maxLines = 1,
