@@ -1,4 +1,4 @@
-package com.pamn.museo.ui.Home
+package com.pamn.museo.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun Pantalla1 (){
+fun HomeScreen (){
     Column (
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -23,5 +23,5 @@ fun Pantalla1 (){
 @Preview(showBackground = true)
 @Composable
 fun PreviewPantalla1(){
-    Pantalla1()
+    HomeScreen()
 }

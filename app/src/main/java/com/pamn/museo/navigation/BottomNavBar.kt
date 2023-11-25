@@ -20,58 +20,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import com.pamn.museo.model.AppScreens
 
 @Composable
 fun BottomNavBar(navController: NavController){
-    val items = listOf(
-        BottomNavigationItem(
-            title="Home",
-            selectedIcon= Icons.Filled.Home,
-            unselectedIcon= Icons.Outlined.Home,
-            route= AppScreens.Home.route,
-            hasNews = false
-        ),
-        BottomNavigationItem(
-            title="Login",
-            selectedIcon= Icons.Filled.Person,
-            unselectedIcon= Icons.Outlined.Person,
-            route= AppScreens.Login.route,
-            hasNews = false
-        )
-    )
-    var selectedItemIndex by rememberSaveable {
-        mutableStateOf(0)
-    }
-    Scaffold (
-        bottomBar = {
-            NavigationBar {
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = selectedItemIndex == index,
-                        onClick = {
-                            selectedItemIndex = index
-                            navController.navigate(item.route)
-                        },
-                        label = {
-                            Text(text = item.title)
-                        },
-                        icon = {
-                            BadgedBox(badge = {
-                                if(item.hasNews){
-                                    Badge()
-                                }
-                            }) {
-                                Icon(
-                                    imageVector = if(index == selectedItemIndex){
-                                        item.selectedIcon
-                                    }else item.unselectedIcon
-                                    , contentDescription = item.title)
-                            }
-                        })
-                }
-            }
-        }
-    ){}
+
 }
+
