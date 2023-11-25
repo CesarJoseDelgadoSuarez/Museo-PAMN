@@ -9,24 +9,36 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pamn.museo.R
@@ -36,13 +48,14 @@ import com.pamn.museo.model.AppScreens
 @Composable
 fun SignInScreen(
     viewModel: SignInViewModel = hiltViewModel(),
-    navigateToHomeOnSuccess: (AppScreens) -> Unit
-){
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(8.dp)
-    ){
-        SignIn(Modifier.align(Alignment.TopCenter), viewModel, navigateToHomeOnSuccess = {navigateToHomeOnSuccess(it)})
+    navigateTo: (AppScreens) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        SignIn(Modifier.align(Alignment.TopCenter), viewModel, navigateTo = { navigateTo(it) })
     }
 }
 
@@ -50,7 +63,7 @@ fun SignInScreen(
 fun SignIn(
     modifier: Modifier,
     viewModel: SignInViewModel,
-    navigateToHomeOnSuccess: (AppScreens) -> Unit
+    navigateTo: (AppScreens) -> Unit
 ) {
 
     val email: String by viewModel.email.observeAsState(initial = "")
@@ -60,28 +73,54 @@ fun SignIn(
     val credentialsError: Boolean by viewModel.credentialsError.observeAsState(initial = false)
 
 
-    if (isLoading){
-    Box(modifier = Modifier.fillMaxSize()){
-        CircularProgressIndicator(Modifier.align(Alignment.Center))
-    }
-    }else{
+    if (isLoading) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(Modifier.align(Alignment.Center))
+        }
+    } else {
         Column(modifier = modifier.verticalScroll(rememberScrollState())) {
+
             ImageLogo(Modifier.align(Alignment.CenterHorizontally))
             Spacer(modifier = Modifier.padding(16.dp))
-            EmailField(email){viewModel.onLoginChanged(it,password)}
+            EmailField(email) { viewModel.onLoginChanged(it, password) }
             Spacer(modifier = Modifier.padding(8.dp))
-            PasswordField(password){viewModel.onLoginChanged(email,it)}
+            PasswordField(password) { viewModel.onLoginChanged(email, it) }
             Spacer(modifier = Modifier.padding(8.dp))
-            if (credentialsError){
+            if (credentialsError) {
                 CredencialesIncorrectas(Modifier.align(Alignment.CenterHorizontally))
                 Spacer(modifier = Modifier.padding(8.dp))
             }
             ForgotPassword(Modifier.align(Alignment.End))
             Spacer(modifier = Modifier.padding(16.dp))
-            LoginButton(loginEnabled){
-                viewModel.onLoginSelected(navigateToHomeOnSuccess = { navigateToHomeOnSuccess(it) })
+            LoginButton(loginEnabled) {
+                viewModel.onLoginSelected(navigateToHomeOnSuccess = { navigateTo(it) })
             }
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            )
+            RegisterButton(
+                navigateTo = { navigateTo(it) }
+            )
         }
+    }
+}
+
+@Composable
+fun RegisterButton(navigateTo: (AppScreens) -> Unit) {
+    Button(
+        onClick = { navigateTo(AppScreens.SignUp) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color(0xFF253b6e),
+            contentColor = Color.White
+        ),
+        enabled = true
+    ) {
+        Text(text = "Registrate")
     }
 }
 
@@ -125,6 +164,7 @@ fun ForgotPassword(modifier: Modifier) {
 
 @Composable
 fun PasswordField(password: String, onTextFieldChange: (String) -> Unit) {
+    var passwordVisibility by remember { mutableStateOf(false) }
     TextField(
         value = password,
         onValueChange = { onTextFieldChange(it) },
@@ -138,7 +178,22 @@ fun PasswordField(password: String, onTextFieldChange: (String) -> Unit) {
             backgroundColor = Color(0xFFDEDDDD),
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
-        )
+        ),
+        visualTransformation = if (passwordVisibility) {
+            VisualTransformation.None
+        } else {
+            PasswordVisualTransformation()
+        },
+        trailingIcon = {
+            val image = if (passwordVisibility) {
+                Icons.Filled.VisibilityOff
+            } else {
+                Icons.Filled.Visibility
+            }
+            IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                Icon(imageVector = image, contentDescription = "boton Ver/Ocultar Contraseña")
+            }
+        },
     )
 }
 
@@ -160,12 +215,13 @@ fun EmailField(email: String, onTextFieldChange: (String) -> Unit) {
         )
     )
 }
+
 @Composable
 fun ImageLogo(modifier: Modifier) {
     Image(
         painter = painterResource(id = R.drawable.logo_museo),
         contentDescription = "Logo de la App",
-        modifier = modifier
+        modifier = modifier.size(300.dp)
     )
 }
 
