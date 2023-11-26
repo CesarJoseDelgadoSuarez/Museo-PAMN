@@ -43,7 +43,7 @@ fun UserInfoScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(id = R.string.welcome_message),
+                    text = stringResource(id = R.string.welcome_message,userData!!.firstName, userData!!.lastName ),
                     style = MaterialTheme.typography.h4
                 )
                 Spacer(modifier = Modifier.height(16.dp))

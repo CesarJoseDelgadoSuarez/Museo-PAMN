@@ -1,11 +1,10 @@
 package com.pamn.museo.ui.userinfo
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.pamn.museo.data.AuthService
 import com.pamn.museo.data.FirestoreService
 import com.pamn.museo.model.FirestoreResult
@@ -24,25 +23,18 @@ class UserInfoViewModel @Inject constructor(
     val userData: LiveData<UserData> = _userData
 
     init {
-        // Obtener el usuario actualmente autenticado
-        val currentUser: FirebaseUser = authService.getCurrentUser()
+        loadUserData()
+    }
 
-        // Si el usuario está autenticado, obtener sus datos de Firestore
-        currentUser.let { user ->
+    private fun loadUserData() {
+        val user = authService.getCurrentUser()
+        Log.d("UserInfoViewModel", "obtenido user: $user")
+        if (user != null) {
             viewModelScope.launch {
-                // Supongamos que el documento del usuario en Firestore se guarda con el UID como ID del documento
-                val documentId = user.uid
-
-                // Obtener datos del usuario desde Firestore
-                val result = firestoreService.getData("users",documentId)
-
-                when (result) {
-                    is FirestoreResult.Success -> {
-                        _userData.value = result.data
-                    }
-                    is FirestoreResult.Error -> {
-                        // Manejar el error según sea necesario
-                    }
+                // Utiliza la función de FirestoreService para obtener los datos del usuario
+                val result = firestoreService.getData("users",user.uid)
+                if (result is FirestoreResult.Success) {
+                    _userData.value = result.data
                 }
             }
         }

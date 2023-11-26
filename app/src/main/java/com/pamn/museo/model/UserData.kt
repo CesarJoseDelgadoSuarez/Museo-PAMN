@@ -7,6 +7,9 @@ data class UserData(
     val firstName: String,
     val lastName: String,
     val email: String,
-    val dateOfBirth: Timestamp
-)
+    val dateOfBirth: Timestamp?
+){
+    // Constructor sin argumentos necesario para la deserialización de Firestore
+    constructor() : this("", "", "", "", null)
+}
 
