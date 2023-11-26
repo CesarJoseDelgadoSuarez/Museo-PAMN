@@ -58,11 +58,3 @@ fun UserInfoScreen(
     }
 
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewUserInfoView() {
-    MuseoTheme {
-        UserInfoScreen()
-    }
-}
