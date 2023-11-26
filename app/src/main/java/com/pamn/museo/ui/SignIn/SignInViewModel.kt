@@ -41,7 +41,7 @@ class SignInViewModel @Inject constructor(
 
     private fun isValidEmail(email: String): Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()
     private fun isValidPassword(password: String): Boolean = password.length >= 6
-    fun onLoginSelected(navigateToHomeOnSuccess: (AppScreens) -> Unit) {
+    fun onLoginSelected(navigateTo: (AppScreens) -> Unit) {
         viewModelScope.launch {
             _isLoading.value= true
 
@@ -50,7 +50,7 @@ class SignInViewModel @Inject constructor(
             when (loginResult) {
                 is LoginResult.Success -> {
                     val user = loginResult.user
-                    navigateToHomeOnSuccess(AppScreens.Home)
+                    navigateTo(AppScreens.UserInfo)
                 }
                 is LoginResult.Error -> {
                     val errorMessage = loginResult.message

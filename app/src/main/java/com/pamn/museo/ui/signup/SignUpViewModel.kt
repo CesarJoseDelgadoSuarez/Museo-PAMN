@@ -5,16 +5,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
 import com.pamn.museo.data.AuthService
+import com.pamn.museo.data.FirestoreService
 import com.pamn.museo.model.AppScreens
 import com.pamn.museo.model.LoginResult
+import com.pamn.museo.model.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val firestoreService: FirestoreService<UserData>
 ) : ViewModel() {
 
     private val _email = MutableLiveData<String>()
@@ -25,6 +30,15 @@ class SignUpViewModel @Inject constructor(
 
     private val _confirmPassword = MutableLiveData<String>()
     val confirmPassword: LiveData<String> = _confirmPassword
+
+    private val _name = MutableLiveData<String>()
+    val name: LiveData<String> = _name
+
+    private val _lastName = MutableLiveData<String>()
+    val lastName: LiveData<String> = _lastName
+
+    private val _dateOfBirth = MutableLiveData<Date>()
+    val dateOfBirth: LiveData<Date> = _dateOfBirth
 
     private val _signUpEnabled = MutableLiveData<Boolean>()
     val signUpEnabled: LiveData<Boolean> = _signUpEnabled
@@ -50,10 +64,25 @@ class SignUpViewModel @Inject constructor(
         updateSignUpButtonState()
     }
 
+    fun onNameChanged(name: String) {
+        _name.value = name
+        updateSignUpButtonState()
+    }
+
+    fun onLastNameChanged(lastName: String) {
+        _lastName.value = lastName
+        updateSignUpButtonState()
+    }
+
+    fun onDateOfBirthSelected(date: Date) {
+        _dateOfBirth.value = date
+        updateSignUpButtonState()
+    }
+
     private fun updateSignUpButtonState() {
         _signUpEnabled.value =
             isValidEmail(_email.value.toString()) && isValidPassword(_password.value.toString()) &&
-                    _password.value == _confirmPassword.value
+                    _password.value == _confirmPassword.value && !_name.value.isNullOrBlank() && !_lastName.value.isNullOrBlank()
     }
 
     private fun isValidEmail(email: String): Boolean =
@@ -74,11 +103,23 @@ class SignUpViewModel @Inject constructor(
             when (signUpResult) {
                 is LoginResult.Success -> {
                     val user = signUpResult.user
-                    navigateTo(AppScreens.Home)
+                    val dateOfBirthTimestamp = _dateOfBirth.value?.let { Timestamp(it) }
+                    firestoreService.insertDataWithDocumentID(
+                        "users",
+                        user.uid,
+                        UserData(
+                            user.uid,
+                            _name.value.toString(),
+                            _lastName.value.toString(),
+                            _email.value.toString(),
+                            Timestamp(Date()),
+                        )
+                    )
+                    navigateTo(AppScreens.UserInfo)
                 }
                 is LoginResult.Error -> {
                     val errorMessage = signUpResult.message
-                    // Mostrar el mensaje de error al usuario
+                    // Manejar el error según sea necesario
                 }
             }
             _isLoading.value = false

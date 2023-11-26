@@ -21,6 +21,7 @@ import com.pamn.museo.model.BottomNavigationItem
 import com.pamn.museo.ui.home.HomeScreen
 import com.pamn.museo.ui.SignIn.SignInScreen
 import com.pamn.museo.ui.signup.SignUpScreen
+import com.pamn.museo.ui.userinfo.UserInfoScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,6 +86,9 @@ fun MuseoNavigation() {
                         // La pantalla no está en el BottomNavigationBar, podrías manejarlo según tus necesidades
                     }
                 })
+            }
+            composable(route = AppScreens.UserInfo.route) {
+                UserInfoScreen()
             }
         }
     }

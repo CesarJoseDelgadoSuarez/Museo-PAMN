@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Museo</string>
+    <string name="welcome_message">Bienvenido, %1$s %2$s</string>
 </resources>

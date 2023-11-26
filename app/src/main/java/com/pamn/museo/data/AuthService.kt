@@ -13,7 +13,7 @@ class AuthService @Inject constructor(private val firebaseAuth: FirebaseAuth) {
     suspend fun loginWithEmailAndPassword(email: String, password: String): LoginResult {
         try {
             val user = firebaseAuth.signInWithEmailAndPassword(email, password).await().user
-            return LoginResult.Success(user)
+            return LoginResult.Success(user!!)
         } catch (e: FirebaseAuthException) {
             val errorMessage = when (e.errorCode) {
                 "ERROR_INVALID_EMAIL" -> "Correo electrónico no válido."
@@ -32,7 +32,7 @@ class AuthService @Inject constructor(private val firebaseAuth: FirebaseAuth) {
     suspend fun signUpWithEmailAndPassword(email: String, password: String): LoginResult {
         try {
             val user = firebaseAuth.createUserWithEmailAndPassword(email, password).await().user
-            return LoginResult.Success(user)
+            return LoginResult.Success(user!!)
         } catch (e: FirebaseAuthException) {
             val errorMessage = when (e.errorCode) {
                 "ERROR_WEAK_PASSWORD" -> "Contraseña débil. Debe tener al menos 6 caracteres."
@@ -48,6 +48,7 @@ class AuthService @Inject constructor(private val firebaseAuth: FirebaseAuth) {
         }
     }
 
+    fun getCurrentUser(): FirebaseUser = firebaseAuth.currentUser!!
 
 
 }
