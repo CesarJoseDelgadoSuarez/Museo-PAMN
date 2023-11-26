@@ -1,6 +1,7 @@
 package com.pamn.museo.ui.signup
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
@@ -26,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.pamn.museo.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pamn.museo.model.AppScreens
+import java.util.Date
 
 @Composable
 fun SignUpScreen(
@@ -46,7 +48,6 @@ fun SignUpScreen(
             .padding(8.dp)
     ) {
         SignUp(
-            Modifier.align(Alignment.TopCenter),
             viewModel,
             navigateTo = { navigateTo(it) }
         )
@@ -55,15 +56,18 @@ fun SignUpScreen(
 
 @Composable
 fun SignUp(
-    modifier: Modifier,
     viewModel: SignUpViewModel,
     navigateTo: (AppScreens) -> Unit
 ) {
     val email: String by viewModel.email.observeAsState(initial = "")
     val password: String by viewModel.password.observeAsState(initial = "")
     val confirmPassword: String by viewModel.confirmPassword.observeAsState(initial = "")
+    val name: String by viewModel.name.observeAsState(initial = "")
+    val lastName: String by viewModel.lastName.observeAsState(initial = "")
     val signUpEnabled: Boolean by viewModel.signUpEnabled.observeAsState(initial = false)
     val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
+
+    val dateOfBirth: Date? by viewModel.dateOfBirth.observeAsState(initial = null)
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -71,21 +75,74 @@ fun SignUp(
         }
     } else {
         Column(
-            modifier = modifier.verticalScroll(rememberScrollState())
+            modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
             ImageLogo(Modifier.align(Alignment.CenterHorizontally))
-            Spacer (modifier = Modifier.padding(16.dp))
+            Spacer(modifier = Modifier.padding(16.dp))
+            NameFields(name, lastName, onNameChanged = { viewModel.onNameChanged(it) }, onLastNameChanged = { viewModel.onLastNameChanged(it) })
+            Spacer(modifier = Modifier.padding(8.dp))
             EmailField(email) { viewModel.onEmailChanged(it) }
             Spacer(modifier = Modifier.padding(8.dp))
-            PasswordField(password) { viewModel.onPasswordChanged(it) }
+            SignUpPasswordField(password, "Contraseña") { viewModel.onPasswordChanged(it) }
             Spacer(modifier = Modifier.padding(8.dp))
-            ConfirmPasswordField(confirmPassword) { viewModel.onConfirmPasswordChanged(it) }
+            SignUpPasswordField(confirmPassword, "Confirmar Contraseña") { viewModel.onConfirmPasswordChanged(it) }
+            Spacer(modifier = Modifier.padding(16.dp))
+            //DateOfBirthPicker(dateOfBirth) { selectedDate -> viewModel.onDateOfBirthSelected(selectedDate)}
             Spacer(modifier = Modifier.padding(16.dp))
             SignUpButton(signUpEnabled) {
                 viewModel.onSignUpSelected(navigateTo = { navigateTo(it) })
             }
         }
     }
+}
+
+
+@Composable
+fun NameFields(
+    name: String,
+    lastName: String,
+    onNameChanged: (String) -> Unit,
+    onLastNameChanged: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        SignUpField(
+            modifier = Modifier.weight(1f),
+            value = name,
+            placeholder = "Nombre"
+        ) { onNameChanged(it) }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        SignUpField(
+            modifier = Modifier.weight(1f),
+            value = lastName,
+            placeholder = "Apellido"
+        ) { onLastNameChanged(it) }
+    }
+}
+
+
+
+
+@Composable
+fun SignUpField(modifier: Modifier,value: String, placeholder: String, onTextFieldChange: (String) -> Unit) {
+    TextField(
+        value = value,
+        onValueChange = { onTextFieldChange(it) },
+        modifier = modifier,
+        placeholder = { Text(text = placeholder) },
+        singleLine = true,
+        maxLines = 1,
+        colors = TextFieldDefaults.textFieldColors(
+            textColor = Color(0xFF636262),
+            backgroundColor = Color(0xFFDEDDDD),
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        )
+    )
 }
 
 @Composable
@@ -109,16 +166,14 @@ fun SignUpButton(signUpEnabled: Boolean, onSignUpSelected: () -> Unit) {
 
 
 @Composable
-fun PasswordField(confirmPassword: String, onTextFieldChange: (String) -> Unit) {
-
+fun SignUpPasswordField(value: String, placeholder: String, onValueChange: (String) -> Unit) {
     var passwordVisibility by remember { mutableStateOf(false) }
 
     TextField(
-        value = confirmPassword,
-        onValueChange = { onTextFieldChange(it) },
+        value = value,
+        onValueChange = { onValueChange(it) },
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text(text = "Confirmar Contraseña") },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        placeholder = { Text(text = placeholder) },
         singleLine = true,
         maxLines = 1,
         colors = TextFieldDefaults.textFieldColors(
@@ -133,49 +188,7 @@ fun PasswordField(confirmPassword: String, onTextFieldChange: (String) -> Unit) 
             PasswordVisualTransformation()
         },
         trailingIcon = {
-            val image = if (passwordVisibility) {
-                Icons.Filled.VisibilityOff
-            } else {
-                Icons.Filled.Visibility
-            }
-            IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                Icon(imageVector = image, contentDescription = "boton Ver/Ocultar Contraseña")
-            }
-        },
-    )
-}
-
-
-@Composable
-fun ConfirmPasswordField(confirmPassword: String, onTextFieldChange: (String) -> Unit) {
-
-    var passwordVisibility by remember { mutableStateOf(false) }
-
-    TextField(
-        value = confirmPassword,
-        onValueChange = { onTextFieldChange(it) },
-        modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text(text = "Confirmar Contraseña") },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        singleLine = true,
-        maxLines = 1,
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = Color(0xFF636262),
-            backgroundColor = Color(0xFFDEDDDD),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        ),
-        visualTransformation = if (passwordVisibility) {
-            VisualTransformation.None
-        } else {
-            PasswordVisualTransformation()
-        },
-        trailingIcon = {
-            val image = if (passwordVisibility) {
-                Icons.Filled.VisibilityOff
-            } else {
-                Icons.Filled.Visibility
-            }
+            val image = if (passwordVisibility) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
             IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
                 Icon(imageVector = image, contentDescription = "boton Ver/Ocultar Contraseña")
             }

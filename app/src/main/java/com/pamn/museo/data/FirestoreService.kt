@@ -2,48 +2,48 @@ package com.pamn.museo.data
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.pamn.museo.model.DocumentResult
+import com.pamn.museo.model.FirestoreResult
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class FirestoreService<T> constructor(
+class FirestoreService<T> @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val collectionName: String,
     private val dataClass: Class<T>
 ) {
 
-    suspend fun insertDataWithDocumentID(documentId: String, data: Any, collectionName: String) {
+    suspend fun insertDataWithDocumentID(collectionName: String, documentId: String, data: Any) {
         try {
             firestore.collection(collectionName).document(documentId).set(data).await()
-            Log.d(TAG, "Datos insertados correctamente.")
+            Log.d(TAG, "Datos insertados correctamente en la colección $collectionName.")
         } catch (e: Exception) {
-            Log.e(TAG, "Error al insertar datos: ${e.message}", e)
+            Log.e(TAG, "Error al insertar datos en la colección $collectionName: ${e.message}", e)
             throw e
         }
     }
 
-    suspend fun insertData(data: Any, collectionName: String) {
+    suspend fun insertData(collectionName: String, data: Any) {
         try {
             firestore.collection(collectionName).add(data).await()
-            Log.d(TAG, "Datos insertados correctamente.")
+            Log.d(TAG, "Datos insertados correctamente en la colección $collectionName.")
         } catch (e: Exception) {
-            Log.e(TAG, "Error al insertar datos: ${e.message}", e)
+            Log.e(TAG, "Error al insertar datos en la colección $collectionName: ${e.message}", e)
             throw e
         }
     }
 
-    suspend fun getData(documentId: String): DocumentResult<T> {
+    suspend fun getData(collectionName: String, documentId: String): FirestoreResult<T> {
         return try {
             val document = firestore.collection(collectionName).document(documentId).get().await()
 
             if (document.exists()) {
                 val data = document.toObject(dataClass)
-                DocumentResult.Success(data!!)
+                FirestoreResult.Success(data!!)
             } else {
-                DocumentResult.Error("Documento no encontrado")
+                FirestoreResult.Error("Documento no encontrado en la colección $collectionName")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error al obtener datos: ${e.message}", e)
-            DocumentResult.Error(e.message.toString())
+            Log.e(TAG, "Error al obtener datos de la colección $collectionName: ${e.message}", e)
+            FirestoreResult.Error(e.message.toString())
         }
     }
 

@@ -93,7 +93,7 @@ fun SignIn(
             ForgotPassword(Modifier.align(Alignment.End))
             Spacer(modifier = Modifier.padding(16.dp))
             LoginButton(loginEnabled) {
-                viewModel.onLoginSelected(navigateToHomeOnSuccess = { navigateTo(it) })
+                viewModel.onLoginSelected(navigateTo = { navigateTo(it) })
             }
             Divider(
                 modifier = Modifier
