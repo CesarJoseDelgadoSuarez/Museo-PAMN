@@ -1,5 +1,6 @@
 package com.pamn.museo.ui.signup
 
+import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,12 +10,16 @@ import com.google.firebase.Timestamp
 import com.pamn.museo.data.AuthService
 import com.pamn.museo.data.FirestoreService
 import com.pamn.museo.model.AppScreens
+import com.pamn.museo.model.FirestoreResult
 import com.pamn.museo.model.LoginResult
 import com.pamn.museo.model.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Date
 import javax.inject.Inject
+
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
@@ -37,8 +42,7 @@ class SignUpViewModel @Inject constructor(
     private val _lastName = MutableLiveData<String>()
     val lastName: LiveData<String> = _lastName
 
-    private val _dateOfBirth = MutableLiveData<Date>()
-    val dateOfBirth: LiveData<Date> = _dateOfBirth
+    private val _dateOfBirth = MutableLiveData<Timestamp>()
 
     private val _signUpEnabled = MutableLiveData<Boolean>()
     val signUpEnabled: LiveData<Boolean> = _signUpEnabled
@@ -74,9 +78,8 @@ class SignUpViewModel @Inject constructor(
         updateSignUpButtonState()
     }
 
-    fun onDateOfBirthSelected(date: Date) {
+    fun onDateOfBirthSelected(date: Timestamp) {
         _dateOfBirth.value = date
-        updateSignUpButtonState()
     }
 
     private fun updateSignUpButtonState() {
@@ -103,8 +106,7 @@ class SignUpViewModel @Inject constructor(
             when (signUpResult) {
                 is LoginResult.Success -> {
                     val user = signUpResult.user
-                    val dateOfBirthTimestamp = _dateOfBirth.value?.let { Timestamp(it) }
-                    firestoreService.insertDataWithDocumentID(
+                    val firestoreResult = firestoreService.insertDataWithDocumentID(
                         "users",
                         user.uid,
                         UserData(
@@ -112,17 +114,24 @@ class SignUpViewModel @Inject constructor(
                             _name.value.toString(),
                             _lastName.value.toString(),
                             _email.value.toString(),
-                            Timestamp(Date()),
+                            _dateOfBirth.value,
                         )
                     )
-                    navigateTo(AppScreens.UserInfo)
+                    when(firestoreResult){
+                        is FirestoreResult.Success -> {
+                            navigateTo(AppScreens.UserInfo)
+                            _isLoading.value = false
+                        }
+                        is FirestoreResult.Error->{
+                            Log.w("SignUp", firestoreResult.errorMessage)
+                        }
+                    }
                 }
                 is LoginResult.Error -> {
                     val errorMessage = signUpResult.message
-                    // Manejar el error según sea necesario
+                    _isLoading.value = false
                 }
             }
-            _isLoading.value = false
         }
     }
 }

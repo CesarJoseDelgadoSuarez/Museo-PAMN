@@ -1,9 +1,11 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.pamn.museo.ui.signup
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
@@ -15,9 +17,13 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -32,10 +38,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pamn.museo.R
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.firebase.Timestamp
 import com.pamn.museo.model.AppScreens
-import java.util.Date
+import java.time.Instant
+import java.time.ZoneId
 
 @Composable
 fun SignUpScreen(
@@ -67,7 +76,7 @@ fun SignUp(
     val signUpEnabled: Boolean by viewModel.signUpEnabled.observeAsState(initial = false)
     val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
 
-    val dateOfBirth: Date? by viewModel.dateOfBirth.observeAsState(initial = null)
+
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -77,25 +86,73 @@ fun SignUp(
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
+
             ImageLogo(Modifier.align(Alignment.CenterHorizontally))
             Spacer(modifier = Modifier.padding(16.dp))
-            NameFields(name, lastName, onNameChanged = { viewModel.onNameChanged(it) }, onLastNameChanged = { viewModel.onLastNameChanged(it) })
+            NameFields(
+                name,
+                lastName,
+                onNameChanged = { viewModel.onNameChanged(it) },
+                onLastNameChanged = { viewModel.onLastNameChanged(it) })
             Spacer(modifier = Modifier.padding(8.dp))
             EmailField(email) { viewModel.onEmailChanged(it) }
             Spacer(modifier = Modifier.padding(8.dp))
             SignUpPasswordField(password, "Contraseña") { viewModel.onPasswordChanged(it) }
             Spacer(modifier = Modifier.padding(8.dp))
-            SignUpPasswordField(confirmPassword, "Confirmar Contraseña") { viewModel.onConfirmPasswordChanged(it) }
+            SignUpPasswordField(
+                confirmPassword,
+                "Confirmar Contraseña"
+            ) { viewModel.onConfirmPasswordChanged(it) }
             Spacer(modifier = Modifier.padding(16.dp))
-            //DateOfBirthPicker(dateOfBirth) { selectedDate -> viewModel.onDateOfBirthSelected(selectedDate)}
+
+            MyDatePicker(viewModel)
+
             Spacer(modifier = Modifier.padding(16.dp))
             SignUpButton(signUpEnabled) {
                 viewModel.onSignUpSelected(navigateTo = { navigateTo(it) })
             }
         }
+
+
     }
 }
 
+@Composable
+fun MyDatePicker(viewModel: SignUpViewModel) {
+    val state = rememberDatePickerState()
+
+    var showDialog by remember { mutableStateOf(false) }
+
+    Button(onClick = { showDialog = true }) {
+
+        Text(text = "Selecciona una Fecha")
+    }
+    state.selectedDateMillis?.let { millis ->
+        val localDate = Instant.ofEpochMilli(millis).atZone(ZoneId.of("UTC")).toLocalDate()
+        Text(text = "FechaSeleccionada: ${localDate.dayOfMonth}/${localDate.monthValue}/${localDate.year}")
+        val timeStamp = Timestamp(millis / 1000, 0)
+        viewModel.onDateOfBirthSelected(timeStamp)
+    }
+    if (showDialog){
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                Button(onClick = { showDialog = false }, shape = CircleShape) {
+                    Text(text = "Confirmar", fontSize = 15.sp)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showDialog = false }) {
+                    Text(text = "Cancelar")
+                }
+            },
+        ) {
+            DatePicker(state = state)
+        }
+    }
+
+
+}
 
 @Composable
 fun NameFields(
@@ -125,10 +182,13 @@ fun NameFields(
 }
 
 
-
-
 @Composable
-fun SignUpField(modifier: Modifier,value: String, placeholder: String, onTextFieldChange: (String) -> Unit) {
+fun SignUpField(
+    modifier: Modifier,
+    value: String,
+    placeholder: String,
+    onTextFieldChange: (String) -> Unit
+) {
     TextField(
         value = value,
         onValueChange = { onTextFieldChange(it) },
@@ -188,7 +248,8 @@ fun SignUpPasswordField(value: String, placeholder: String, onValueChange: (Stri
             PasswordVisualTransformation()
         },
         trailingIcon = {
-            val image = if (passwordVisibility) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
+            val image =
+                if (passwordVisibility) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
             IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
                 Icon(imageVector = image, contentDescription = "boton Ver/Ocultar Contraseña")
             }

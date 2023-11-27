@@ -1,6 +1,7 @@
 
 package com.pamn.museo.navigation
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -81,10 +82,11 @@ fun MuseoNavigation() {
                     val newIndex = items.indexOfFirst { it.route == screen.route }
                     if (newIndex != -1) {
                         selectedIndex = newIndex
-                        navController.navigate(screen.route)
                     } else {
-                        // La pantalla no está en el BottomNavigationBar, podrías manejarlo según tus necesidades
+                        Log.w("Navegacion!!", "Ruta no reconocida: ${screen.route}")
                     }
+                    navController.navigate(screen.route)
+
                 })
             }
             composable(route = AppScreens.UserInfo.route) {
