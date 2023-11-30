@@ -30,7 +30,7 @@ import com.pamn.museo.R
 
 
 @Composable
-fun MenuUserView() {
+fun MenuUserScreen() {
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -99,5 +99,5 @@ fun CustomButton(text: String, modifier: Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewMenuUser(){
-    MenuUserView()
+    MenuUserScreen()
 }

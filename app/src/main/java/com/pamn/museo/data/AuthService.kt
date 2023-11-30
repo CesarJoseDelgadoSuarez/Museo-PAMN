@@ -49,6 +49,9 @@ class AuthService @Inject constructor(private val firebaseAuth: FirebaseAuth) {
     }
 
     fun getCurrentUser(): FirebaseUser = firebaseAuth.currentUser!!
+    fun signOut() = firebaseAuth.signOut()
+    fun deleteUser() = firebaseAuth.currentUser!!.delete()
+    fun isLoggedIn(): Boolean = firebaseAuth.currentUser != null
 
 
 }

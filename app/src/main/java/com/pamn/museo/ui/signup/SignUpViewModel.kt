@@ -1,5 +1,6 @@
 package com.pamn.museo.ui.signup
 
+import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,19 +9,21 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.pamn.museo.data.AuthService
 import com.pamn.museo.data.FirestoreService
+import com.pamn.museo.data.UserService
 import com.pamn.museo.model.AppScreens
+import com.pamn.museo.model.FirestoreResult
 import com.pamn.museo.model.LoginResult
 import com.pamn.museo.model.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Date
 import javax.inject.Inject
 
+
 @HiltViewModel
-class SignUpViewModel @Inject constructor(
-    private val authService: AuthService,
-    private val firestoreService: FirestoreService<UserData>
-) : ViewModel() {
+class SignUpViewModel @Inject constructor(private val userService: UserService) : ViewModel() {
 
     private val _email = MutableLiveData<String>()
     val email: LiveData<String> = _email
@@ -37,8 +40,7 @@ class SignUpViewModel @Inject constructor(
     private val _lastName = MutableLiveData<String>()
     val lastName: LiveData<String> = _lastName
 
-    private val _dateOfBirth = MutableLiveData<Date>()
-    val dateOfBirth: LiveData<Date> = _dateOfBirth
+    private val _dateOfBirth = MutableLiveData<Timestamp>()
 
     private val _signUpEnabled = MutableLiveData<Boolean>()
     val signUpEnabled: LiveData<Boolean> = _signUpEnabled
@@ -74,9 +76,8 @@ class SignUpViewModel @Inject constructor(
         updateSignUpButtonState()
     }
 
-    fun onDateOfBirthSelected(date: Date) {
+    fun onDateOfBirthSelected(date: Timestamp) {
         _dateOfBirth.value = date
-        updateSignUpButtonState()
     }
 
     private fun updateSignUpButtonState() {
@@ -94,35 +95,22 @@ class SignUpViewModel @Inject constructor(
     fun onSignUpSelected(navigateTo: (AppScreens) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
-
-            val signUpResult = authService.signUpWithEmailAndPassword(
+            val result = userService.SignUpWithEmailAndPassword(
                 _email.value.toString(),
-                _password.value.toString()
+                _password.value.toString(),
+                _name.value.toString(),
+                _lastName.value.toString(),
+                _dateOfBirth.value!!
             )
-
-            when (signUpResult) {
+            when (result) {
                 is LoginResult.Success -> {
-                    val user = signUpResult.user
-                    val dateOfBirthTimestamp = _dateOfBirth.value?.let { Timestamp(it) }
-                    firestoreService.insertDataWithDocumentID(
-                        "users",
-                        user.uid,
-                        UserData(
-                            user.uid,
-                            _name.value.toString(),
-                            _lastName.value.toString(),
-                            _email.value.toString(),
-                            Timestamp(Date()),
-                        )
-                    )
-                    navigateTo(AppScreens.UserInfo)
+                    navigateTo(AppScreens.UserMenu)
                 }
                 is LoginResult.Error -> {
-                    val errorMessage = signUpResult.message
-                    // Manejar el error según sea necesario
+                    _credentialsError.value = true
+                    _isLoading.value = false
                 }
             }
-            _isLoading.value = false
         }
     }
 }
