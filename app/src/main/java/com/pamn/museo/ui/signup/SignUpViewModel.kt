@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.pamn.museo.data.AuthService
 import com.pamn.museo.data.FirestoreService
+import com.pamn.museo.data.UserService
 import com.pamn.museo.model.AppScreens
 import com.pamn.museo.model.FirestoreResult
 import com.pamn.museo.model.LoginResult
@@ -22,10 +23,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(
-    private val authService: AuthService,
-    private val firestoreService: FirestoreService<UserData>
-) : ViewModel() {
+class SignUpViewModel @Inject constructor(private val userService: UserService) : ViewModel() {
 
     private val _email = MutableLiveData<String>()
     val email: LiveData<String> = _email
@@ -97,38 +95,19 @@ class SignUpViewModel @Inject constructor(
     fun onSignUpSelected(navigateTo: (AppScreens) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
-
-            val signUpResult = authService.signUpWithEmailAndPassword(
+            val result = userService.SignUpWithEmailAndPassword(
                 _email.value.toString(),
-                _password.value.toString()
+                _password.value.toString(),
+                _name.value.toString(),
+                _lastName.value.toString(),
+                _dateOfBirth.value!!
             )
-
-            when (signUpResult) {
+            when (result) {
                 is LoginResult.Success -> {
-                    val user = signUpResult.user
-                    val firestoreResult = firestoreService.insertDataWithDocumentID(
-                        "users",
-                        user.uid,
-                        UserData(
-                            user.uid,
-                            _name.value.toString(),
-                            _lastName.value.toString(),
-                            _email.value.toString(),
-                            _dateOfBirth.value,
-                        )
-                    )
-                    when(firestoreResult){
-                        is FirestoreResult.Success -> {
-                            navigateTo(AppScreens.UserInfo)
-                            _isLoading.value = false
-                        }
-                        is FirestoreResult.Error->{
-                            Log.w("SignUp", firestoreResult.errorMessage)
-                        }
-                    }
+                    navigateTo(AppScreens.UserMenu)
                 }
                 is LoginResult.Error -> {
-                    val errorMessage = signUpResult.message
+                    _credentialsError.value = true
                     _isLoading.value = false
                 }
             }

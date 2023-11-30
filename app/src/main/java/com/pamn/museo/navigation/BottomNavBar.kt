@@ -8,22 +8,23 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.pamn.museo.model.AppScreens
 import com.pamn.museo.model.BottomNavigationItem
 
-/// BottomNavigation.kt
 
 @Composable
 fun BottomNavigation(
     selectedIndex: Int,
     items: List<BottomNavigationItem>,
-    onItemSelected: (Int) -> Unit
+    onItemSelected: (Int) -> Unit,
 ) {
     NavigationBar {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 selected = selectedIndex == index,
                 onClick = {
-                    onItemSelected(index)
+
+                        onItemSelected(index)
                 },
                 label = {
                     Text(text = item.title)

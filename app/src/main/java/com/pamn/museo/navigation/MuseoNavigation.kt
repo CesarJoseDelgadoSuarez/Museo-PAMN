@@ -1,4 +1,3 @@
-
 package com.pamn.museo.navigation
 
 import android.util.Log
@@ -17,16 +16,17 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.pamn.museo.data.AuthService
 import com.pamn.museo.model.AppScreens
 import com.pamn.museo.model.BottomNavigationItem
 import com.pamn.museo.ui.home.HomeScreen
 import com.pamn.museo.ui.SignIn.SignInScreen
+import com.pamn.museo.ui.menuUser.MenuUserScreen
 import com.pamn.museo.ui.signup.SignUpScreen
-import com.pamn.museo.ui.userinfo.UserInfoScreen
 
-@OptIn(ExperimentalMaterial3Api::class)
+@ExperimentalMaterial3Api
 @Composable
-fun MuseoNavigation() {
+fun MuseoNavigation(authService: AuthService) {
     val navController = rememberNavController()
     val items = listOf(
         BottomNavigationItem(
@@ -41,7 +41,7 @@ fun MuseoNavigation() {
             selectedIcon = Icons.Filled.Person,
             unselectedIcon = Icons.Outlined.Person,
             route = AppScreens.SignIn.route,
-            hasNews = false
+            hasNews = false,
         )
     )
 
@@ -56,11 +56,16 @@ fun MuseoNavigation() {
                 items = items,
                 onItemSelected = { index ->
                     selectedIndex = index
-                    navController.navigate(items[index].route)
-                }
+                    val route = items[index].route
+                    if(authService.isLoggedIn() && route == AppScreens.SignIn.route){
+                        navController.navigate(AppScreens.UserMenu.route)
+                    }else{
+                        navController.navigate(route)
+                    }
+                },
             )
         }
-    ) { it ->
+    ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = AppScreens.Home.route
@@ -89,8 +94,8 @@ fun MuseoNavigation() {
 
                 })
             }
-            composable(route = AppScreens.UserInfo.route) {
-                UserInfoScreen()
+            composable(route = AppScreens.UserMenu.route) {
+                MenuUserScreen()
             }
         }
     }
