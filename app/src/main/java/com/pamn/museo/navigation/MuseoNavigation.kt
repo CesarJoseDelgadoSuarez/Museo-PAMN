@@ -23,6 +23,7 @@ import com.pamn.museo.ui.home.HomeScreen
 import com.pamn.museo.ui.SignIn.SignInScreen
 import com.pamn.museo.ui.menuUser.MenuUserScreen
 import com.pamn.museo.ui.signup.SignUpScreen
+import com.pamn.museo.ui.userlogic.UserLogicScreen
 
 @ExperimentalMaterial3Api
 @Composable
@@ -40,7 +41,7 @@ fun MuseoNavigation(authService: AuthService) {
             title = "Login",
             selectedIcon = Icons.Filled.Person,
             unselectedIcon = Icons.Outlined.Person,
-            route = AppScreens.SignIn.route,
+            route = AppScreens.UserLogic.route,
             hasNews = false,
         )
     )
@@ -56,12 +57,7 @@ fun MuseoNavigation(authService: AuthService) {
                 items = items,
                 onItemSelected = { index ->
                     selectedIndex = index
-                    val route = items[index].route
-                    if(authService.isLoggedIn() && route == AppScreens.SignIn.route){
-                        navController.navigate(AppScreens.UserMenu.route)
-                    }else{
-                        navController.navigate(route)
-                    }
+                    navController.navigate(items[index].route)
                 },
             )
         }
@@ -72,6 +68,11 @@ fun MuseoNavigation(authService: AuthService) {
         ) {
             composable(route = AppScreens.Home.route) {
                 HomeScreen()
+            }
+            composable(route = AppScreens.UserLogic.route) {
+                UserLogicScreen(){
+                    navController.navigate(it.route)
+                }
             }
             composable(route = AppScreens.SignIn.route) {
                 SignInScreen(navigateTo = { screen ->
