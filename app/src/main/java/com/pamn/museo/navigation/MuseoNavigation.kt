@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import com.pamn.museo.ui.SignIn.SignInScreen
 import com.pamn.museo.ui.menuUser.MenuUserScreen
 import com.pamn.museo.ui.signup.SignUpScreen
 import com.pamn.museo.ui.userlogic.UserLogicScreen
+import com.pamn.museo.ui.qr.QrScreen
 
 @ExperimentalMaterial3Api
 @Composable
@@ -36,6 +39,13 @@ fun MuseoNavigation(authService: AuthService) {
             unselectedIcon = Icons.Outlined.Home,
             route = AppScreens.Home.route,
             hasNews = false
+        ),
+        BottomNavigationItem(
+            title = "QrScan",
+            selectedIcon = Icons.Filled.QrCodeScanner,
+            unselectedIcon = Icons.Outlined.QrCodeScanner,
+            route = AppScreens.QrCodeScanner.route,
+            hasNews = false,
         ),
         BottomNavigationItem(
             title = "Login",
@@ -73,6 +83,9 @@ fun MuseoNavigation(authService: AuthService) {
                 UserLogicScreen(){
                     navController.navigate(it.route)
                 }
+            }
+            composable(route = AppScreens.QrCodeScanner.route) {
+                QrScreen()
             }
             composable(route = AppScreens.SignIn.route) {
                 SignInScreen(navigateTo = { screen ->

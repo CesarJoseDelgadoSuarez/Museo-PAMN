@@ -6,4 +6,5 @@ sealed class AppScreens(val route: String){
     object SignUp: AppScreens("signup")
     object UserMenu: AppScreens("usermenu")
     object UserLogic: AppScreens("userlogic")
+    object QrCodeScanner: AppScreens("qrcodescanner")
 }
