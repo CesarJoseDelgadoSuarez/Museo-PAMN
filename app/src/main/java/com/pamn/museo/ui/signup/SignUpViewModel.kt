@@ -104,7 +104,7 @@ class SignUpViewModel @Inject constructor(private val userService: UserService) 
             )
             when (result) {
                 is LoginResult.Success -> {
-                    navigateTo(AppScreens.UserMenu)
+                    navigateTo(AppScreens.UserInfo)
                 }
                 is LoginResult.Error -> {
                     _credentialsError.value = true

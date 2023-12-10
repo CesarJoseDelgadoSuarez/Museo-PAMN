@@ -33,14 +33,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.pamn.museo.model.AppScreens
 
 @Composable
-fun QrScreen() {
-    QRCodeScannerTheme()
+fun QrScreen(navigateTo: (String) -> Unit) {
+    QRCodeScannerTheme(navigateTo = navigateTo)
 }
 
 @Composable
-fun QRCodeScannerTheme() {
+fun QRCodeScannerTheme(navigateTo: (String) -> Unit) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
 
         val context = LocalContext.current
@@ -85,12 +86,13 @@ fun QRCodeScannerTheme() {
                                 .fillMaxWidth()
                         )
                         Text(
-                            text = "id: $id",
+                            text = "id: .${id.trim()}.",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier
                                 .fillMaxWidth()
                         )
+                        navigateTo(AppScreens.ExpoElement.route.replace("{id}", id.trim()))
                     }
                 } else {
                     AndroidView(

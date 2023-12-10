@@ -1,5 +1,6 @@
 package com.pamn.museo.ui.expoelement
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,7 +26,8 @@ import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun ExpoElementScreen(
-    viewModel: ExpoElementViewModel = hiltViewModel()
+    viewModel: ExpoElementViewModel = hiltViewModel(),
+    id: String
 ) {
     val expoElement: ExpoElement? by viewModel.expoElement.observeAsState()
 
@@ -33,7 +35,8 @@ fun ExpoElementScreen(
 
     LaunchedEffect(key1 = true) {
         coroutineScope {
-            viewModel.setExpoElement("ff1xKFNdrRjVERDzKryq")
+            Log.d("ExpoElementScreen", "id: .$id.")
+            viewModel.setExpoElement(id)
         }
     }
 

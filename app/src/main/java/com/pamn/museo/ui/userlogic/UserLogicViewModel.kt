@@ -24,7 +24,7 @@ private val authService: AuthService
     init {
         _isLoading.value = true
         if (authService.getCurrentUser() != null) {
-            _screen.value = AppScreens.UserMenu
+            _screen.value = AppScreens.UserInfo
         }else{
             _screen.value = AppScreens.SignIn
         }

@@ -21,12 +21,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pamn.museo.R
+import com.pamn.museo.model.AppScreens
 import com.pamn.museo.model.UserData
 import com.pamn.museo.ui.theme.MuseoTheme
 
 @Composable
 fun UserInfoScreen(
     viewModel: UserInfoViewModel = hiltViewModel(),
+    navigateTo: (AppScreens) -> Unit
 ) {
     val userData by viewModel.userData.observeAsState()
 
@@ -43,17 +45,37 @@ fun UserInfoScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(id = R.string.welcome_message,userData!!.firstName, userData!!.lastName ),
+                    text = stringResource(
+                        id = R.string.welcome_message,
+                        userData!!.firstName,
+                        userData!!.lastName
+                    ),
                     style = MaterialTheme.typography.h4
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(text = "Name: ${userData!!.firstName}", style = MaterialTheme.typography.body1)
-                Text(text = "Lastname: ${userData!!.lastName}", style = MaterialTheme.typography.body1)
+                Text(
+                    text = "Lastname: ${userData!!.lastName}",
+                    style = MaterialTheme.typography.body1
+                )
                 Text(text = "Email: ${userData!!.email}", style = MaterialTheme.typography.body1)
+
+                Button(
+                    onClick = {
+                        viewModel.signOut()
+                        navigateTo(AppScreens.SignIn)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                ) {
+                    Text(text = "Sign Out")
+                }
             }
+
+
         } else {
-            // Puedes manejar el caso en el que los datos del usuario no estén disponibles
-            Text(text = "Cargando datos...")
+            CircularProgressIndicator()
         }
     }
 

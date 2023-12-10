@@ -30,6 +30,7 @@ import com.pamn.museo.ui.menuUser.MenuUserScreen
 import com.pamn.museo.ui.signup.SignUpScreen
 import com.pamn.museo.ui.userlogic.UserLogicScreen
 import com.pamn.museo.ui.qr.QrScreen
+import com.pamn.museo.ui.userinfo.UserInfoScreen
 
 @ExperimentalMaterial3Api
 @Composable
@@ -41,13 +42,6 @@ fun MuseoNavigation(authService: AuthService) {
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
             route = AppScreens.Home.route,
-            hasNews = false
-        ),
-        BottomNavigationItem(
-            title = "Home",
-            selectedIcon = Icons.Filled.ImageSearch,
-            unselectedIcon = Icons.Outlined.ImageSearch,
-            route = AppScreens.ExpoElement.route,
             hasNews = false
         ),
         BottomNavigationItem(
@@ -89,8 +83,10 @@ fun MuseoNavigation(authService: AuthService) {
             composable(route = AppScreens.Home.route) {
                 HomeScreen()
             }
-            composable(route = AppScreens.ExpoElement.route) {
-                ExpoElementScreen()
+            composable(route = AppScreens.ExpoElement.route) { backStackEntry ->
+                ExpoElementScreen(
+                    id = backStackEntry.arguments?.getString("id").orEmpty()
+                )
             }
             composable(route = AppScreens.UserLogic.route) {
                 UserLogicScreen(){
@@ -98,7 +94,9 @@ fun MuseoNavigation(authService: AuthService) {
                 }
             }
             composable(route = AppScreens.QrCodeScanner.route) {
-                QrScreen()
+                QrScreen(){
+                    navController.navigate(it)
+                }
             }
             composable(route = AppScreens.SignIn.route) {
                 SignInScreen(navigateTo = { screen ->
@@ -121,8 +119,10 @@ fun MuseoNavigation(authService: AuthService) {
 
                 })
             }
-            composable(route = AppScreens.UserMenu.route) {
-                MenuUserScreen()
+            composable(route = AppScreens.UserInfo.route) {
+                UserInfoScreen(){
+                    navController.navigate(it.route)
+                }
             }
         }
     }
