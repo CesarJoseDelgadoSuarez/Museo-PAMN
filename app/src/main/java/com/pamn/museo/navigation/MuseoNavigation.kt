@@ -3,9 +3,11 @@ package com.pamn.museo.navigation
 import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ImageSearch
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.ImageSearch
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +25,7 @@ import com.pamn.museo.model.AppScreens
 import com.pamn.museo.model.BottomNavigationItem
 import com.pamn.museo.ui.home.HomeScreen
 import com.pamn.museo.ui.SignIn.SignInScreen
+import com.pamn.museo.ui.expoelement.ExpoElementScreen
 import com.pamn.museo.ui.menuUser.MenuUserScreen
 import com.pamn.museo.ui.signup.SignUpScreen
 import com.pamn.museo.ui.userlogic.UserLogicScreen
@@ -38,6 +41,13 @@ fun MuseoNavigation(authService: AuthService) {
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
             route = AppScreens.Home.route,
+            hasNews = false
+        ),
+        BottomNavigationItem(
+            title = "Home",
+            selectedIcon = Icons.Filled.ImageSearch,
+            unselectedIcon = Icons.Outlined.ImageSearch,
+            route = AppScreens.ExpoElement.route,
             hasNews = false
         ),
         BottomNavigationItem(
@@ -78,6 +88,9 @@ fun MuseoNavigation(authService: AuthService) {
         ) {
             composable(route = AppScreens.Home.route) {
                 HomeScreen()
+            }
+            composable(route = AppScreens.ExpoElement.route) {
+                ExpoElementScreen()
             }
             composable(route = AppScreens.UserLogic.route) {
                 UserLogicScreen(){

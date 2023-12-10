@@ -15,4 +15,10 @@ object UserDataModule {
     fun provideUserDataClass(): Class<UserData> {
         return UserData::class.java
     }
+
+    @Singleton
+    @Provides
+    fun provideExpoElementDataClass(): Class<ExpoElement> {
+        return ExpoElement::class.java
+    }
 }
