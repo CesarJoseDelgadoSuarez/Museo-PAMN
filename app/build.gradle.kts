@@ -72,6 +72,18 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.compose.material:material")
 
+    //Accompanist - carga de imagenes mediante url
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+
+    //CameraX
+    implementation("androidx.camera:camera-camera2:1.0.2")
+    implementation("androidx.camera:camera-lifecycle:1.0.2")
+    implementation("androidx.camera:camera-view:1.0.0-alpha31")
+
+    //Zxing
+    implementation("com.google.zxing:core:3.3.3")
+
 
     // Dependency Injection
     implementation("com.google.dagger:hilt-android:2.44")

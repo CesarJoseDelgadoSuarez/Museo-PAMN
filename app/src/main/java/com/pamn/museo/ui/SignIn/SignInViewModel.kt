@@ -50,7 +50,7 @@ class SignInViewModel @Inject constructor(
             when (loginResult) {
                 is LoginResult.Success -> {
                     val user = loginResult.user
-                    navigateTo(AppScreens.UserMenu)
+                    navigateTo(AppScreens.UserInfo)
                 }
                 is LoginResult.Error -> {
                     val errorMessage = loginResult.message

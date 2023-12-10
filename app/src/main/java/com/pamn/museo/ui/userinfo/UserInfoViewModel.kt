@@ -39,4 +39,8 @@ class UserInfoViewModel @Inject constructor(
             }
         }
     }
+
+    fun signOut() {
+        authService.signOut()
+    }
 }
