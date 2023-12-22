@@ -47,6 +47,13 @@ fun UserInfoScreen(
                 },
                 backgroundColor = Color.Red
             )
+            CustomButtonForUsers(
+                text = "Botón de prueba",
+                onClick = {
+                    /**/
+                },
+                backgroundColor = Color.Blue
+            )
         } else {
             CircularProgressIndicator()
         }
