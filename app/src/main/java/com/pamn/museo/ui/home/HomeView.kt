@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
+import com.pamn.museo.ui.components.ImageSlider
 
 
 @Composable
@@ -30,13 +31,15 @@ fun HomeScreen( viewModel: HomeViewModel = hiltViewModel()) {
 
     ) {
         Text(
-            text = "Bienvenido a Museo",
+            text = "Bienvenido a Museo-TCT",
             style = MaterialTheme.typography.headlineLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         )
+
+        ImageSlider()
     }
 }
 
