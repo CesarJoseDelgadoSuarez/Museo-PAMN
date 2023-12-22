@@ -1,29 +1,20 @@
 package com.pamn.museo.ui.userinfo
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pamn.museo.R
 import com.pamn.museo.model.AppScreens
-import com.pamn.museo.model.UserData
-import com.pamn.museo.ui.theme.MuseoTheme
 
 @Composable
 fun UserInfoScreen(
@@ -32,51 +23,61 @@ fun UserInfoScreen(
 ) {
     val userData by viewModel.userData.observeAsState()
 
-    Box(
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+            .padding(16.dp)
     ) {
         if (userData != null) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = stringResource(
-                        id = R.string.welcome_message,
-                        userData!!.firstName,
-                        userData!!.lastName
-                    ),
-                    style = MaterialTheme.typography.h4
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Name: ${userData!!.firstName}", style = MaterialTheme.typography.body1)
-                Text(
-                    text = "Lastname: ${userData!!.lastName}",
-                    style = MaterialTheme.typography.body1
-                )
-                Text(text = "Email: ${userData!!.email}", style = MaterialTheme.typography.body1)
+            UserAvatar()
 
-                Button(
-                    onClick = {
-                        viewModel.signOut()
-                        navigateTo(AppScreens.SignIn)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
-                ) {
-                    Text(text = "Sign Out")
-                }
-            }
+            Spacer(modifier = Modifier.height(16.dp))
 
+            Text(text = "Nombre: ${userData!!.firstName} ${userData!!.lastName}", style = MaterialTheme.typography.body1)
+            Text(text = "Email: ${userData!!.email}", style = MaterialTheme.typography.body1)
 
+            Spacer(modifier = Modifier.height(64.dp))
+
+            CustomButtonForUsers(
+                text = "Cerrar sesión",
+                onClick = {
+                    viewModel.signOut()
+                    navigateTo(AppScreens.SignIn)
+                },
+                backgroundColor = Color.Red
+            )
         } else {
             CircularProgressIndicator()
         }
     }
+}
 
+@Composable
+fun UserAvatar() {
+    val userImage = painterResource(id = R.drawable.user_image)
+    Image(
+        painter = userImage,
+        contentDescription = "Imagen de perfil",
+        modifier = Modifier
+            .size(120.dp)
+            .clip(CircleShape)
+    )
+}
+
+@Composable
+fun CustomButtonForUsers(
+    text: String,
+    onClick: () -> Unit,
+    backgroundColor: Color
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        colors = ButtonDefaults.buttonColors(backgroundColor = backgroundColor)
+    ) {
+        Text(text = text, color = Color.White)
+    }
 }
